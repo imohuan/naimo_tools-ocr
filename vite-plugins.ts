@@ -144,16 +144,8 @@ function modifyManifestForDev(sourcePath: string, destPath: string): void {
     if (!existsSync(destDir)) {
       mkdirSync(destDir, { recursive: true });
     }
-
-    // 先从源位置复制文件到目标位置（如果目标文件不存在）
-    if (!existsSync(destPath)) {
-      if (!existsSync(sourcePath)) {
-        console.error(`❌ 源文件不存在: ${sourcePath}`);
-        return;
-      }
-      copyFileSync(sourcePath, destPath);
-      console.log('📋 已复制 manifest.json 到 dist 目录');
-    }
+    copyFileSync(sourcePath, destPath);
+    console.log('📋 已复制 manifest.json 到 dist 目录');
 
     const content = readFileSync(destPath, 'utf-8');
     const manifest = JSON.parse(content);

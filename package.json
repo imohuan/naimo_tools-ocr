@@ -1,7 +1,7 @@
 {
-  "name": "naimo-plugin-template",
+  "name": "ocr-plugin",
   "version": "1.0.0",
-  "description": "Naimo Tools 插件开发模板",
+  "description": "智能截图识别文字并翻译，支持多种语言互译",
   "type": "module",
   "scripts": {
     "init": "pnpm i && pnpm run add-electron-types && pnpm run dev",
@@ -15,19 +15,22 @@
   "keywords": [
     "naimo",
     "plugin",
-    "electron"
+    "electron",
+    "ocr",
+    "translation"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/imohuan/naimo_tools-ocr.git"
+    "url": "git+https://github.com/naimo-tools/ocr-plugin.git"
   },
-  "author": "",
+  "author": "Naimo Tools",
   "license": "MIT",
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.13",
     "@types/node": "^22.0.0",
+    "autoprefixer": "^10.4.20",
     "electron": "^38.2.2",
-    "tailwindcss": "^4.1.13",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.9.2",
     "vite": "^7.1.5"
   }

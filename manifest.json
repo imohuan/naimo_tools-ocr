@@ -1,30 +1,64 @@
 {
   "$schema": "./schema.json",
-  "id": "my-plugin",
-  "name": "我的插件",
-  "version": "1.0.0",
-  "author": "你的名字",
-  "icon": "🎯",
-  "description": "这是一个使用 TypeScript 开发的 Naimo 插件",
-  "category": "other",
+  "id": "ocr-plugin",
+  "name": "OCR翻译识别",
+  "version": "1.0.2",
+  "author": "Naimo Tools",
+  "icon": "📷",
+  "description": "智能截图识别文字并翻译，支持多种语言互译",
+  "category": "ai_artificial_intelligence",
   "enabled": true,
   "main": "./index.html",
   "preload": "./preload.js",
   "feature": [
     {
-      "path": "hello",
-      "name": "打招呼",
-      "icon": "👋",
-      "description": "向世界问好",
+      "path": "ocr-translate",
+      "name": "OCR翻译",
+      "icon": "🔍",
+      "description": "截图识别文字并翻译",
       "type": "text",
       "weight": 100,
       "lifecycleType": "reuse",
       "singleton": true,
       "anonymousSearchFields": [
-        "hello",
-        "world",
-        "你好"
+        "ocr",
+        "翻译",
+        "识别",
+        "截图"
       ]
+    },
+    {
+      "path": "quick-ocr",
+      "name": "快速截图识别",
+      "icon": "⚡",
+      "description": "快速截图并识别文字",
+      "type": "text",
+      "weight": 90,
+      "lifecycleType": "reuse",
+      "singleton": true,
+      "anonymousSearchFields": [
+        "快速ocr",
+        "快速识别",
+        "截图识别"
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "name": "tencentSecretId",
+      "title": "腾讯云Secret ID",
+      "description": "腾讯云API密钥ID（用于OCR和翻译服务）",
+      "type": "input",
+      "defaultValue": "",
+      "required": true
+    },
+    {
+      "name": "tencentSecretKey",
+      "title": "腾讯云Secret Key",
+      "description": "腾讯云API密钥Key",
+      "type": "input",
+      "defaultValue": "",
+      "required": true
     }
   ]
 }

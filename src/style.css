@@ -1,1 +1,158 @@
 @import "tailwindcss";
+
+/* ==================== 自定义样式 ==================== */
+
+* {
+  @apply box-border;
+}
+
+body {
+  @apply m-0 p-0 h-screen overflow-hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Canvas 样式 */
+#canvas {
+  @apply fixed top-0 left-0 w-screen h-screen cursor-grab bg-white;
+}
+
+#canvas:active {
+  @apply cursor-grabbing;
+}
+
+/* 控制栏样式 */
+.control-bar {
+  @apply fixed bottom-2.5 left-1/2 -translate-x-1/2 flex gap-3 bg-white/90 backdrop-blur-md px-5 py-1.5 rounded-full border border-black/10 z-[100] shadow-lg;
+}
+
+.control-btn {
+  @apply w-6 h-6 border-none outline-none rounded-full bg-black/5 text-gray-800 text-base cursor-pointer transition-all duration-200 flex items-center justify-center hover:bg-black/10 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:bg-black/5;
+}
+
+/* 设置抽屉样式 */
+.settings-drawer {
+  @apply fixed top-0 -right-[350px] w-[350px] h-screen bg-white border-l border-black/10 z-[200] transition-all duration-300;
+}
+
+.settings-drawer.open {
+  @apply right-0;
+}
+
+.settings-header {
+  @apply flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-gray-50;
+}
+
+.settings-header h2 {
+  @apply text-sm text-gray-800 m-0 font-medium;
+}
+
+.close-btn {
+  @apply bg-transparent border-none text-2xl cursor-pointer text-gray-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-200;
+}
+
+.settings-content {
+  @apply p-3 h-[calc(100vh-50px)] overflow-y-auto;
+}
+
+/* 设置行样式 */
+.setting-line {
+  @apply flex items-center gap-2 py-1.5 border-b border-gray-100 min-h-8;
+}
+
+.setting-line:last-child {
+  @apply border-b-0;
+}
+
+.setting-label {
+  @apply text-xs text-gray-800 font-medium min-w-20 flex-shrink-0;
+}
+
+/* API 状态样式 */
+.api-status-inline {
+  @apply flex items-center gap-1 text-[11px];
+}
+
+.status-indicator {
+  @apply text-[10px];
+}
+
+/* 选择框样式 */
+.select-inline {
+  @apply text-[11px] px-1 py-0.5 border border-gray-300 rounded bg-white min-w-[70px];
+}
+
+.separator {
+  @apply text-gray-400 text-xs;
+}
+
+/* 切换按钮样式 */
+.toggle-btn {
+  @apply text-[10px] px-1.5 py-1 border border-gray-300 rounded bg-gray-100 cursor-pointer transition-all duration-200 min-w-7 flex items-center justify-center hover:bg-gray-200;
+}
+
+.toggle-btn svg {
+  @apply w-3 h-3;
+}
+
+.toggle-btn.active {
+  @apply bg-blue-500 text-white border-blue-500;
+}
+
+/* 颜色输入框 */
+.color-input {
+  @apply w-6 h-6 border-none rounded cursor-pointer p-0;
+}
+
+/* 数字输入框 */
+.number-input {
+  @apply w-[45px] text-[11px] px-1 py-0.5 border border-gray-300 rounded text-center;
+}
+
+.number-input::-webkit-outer-spin-button,
+.number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 范围滑块 */
+.range-input {
+  @apply w-[60px] h-5;
+}
+
+.range-value {
+  @apply text-[10px] text-gray-600 min-w-[30px] text-center;
+}
+
+/* 加载动画 */
+.loading {
+  @apply fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-gray-800 bg-white/95 p-8 rounded-xl z-[150] shadow-xl;
+}
+
+.spinner {
+  @apply w-10 h-10 border-4 border-black/10 border-t-blue-500 rounded-full animate-spin mx-auto mb-4;
+}
+
+/* 占位符样式 */
+.placeholder {
+  @apply fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-gray-400 text-base z-[50] pointer-events-none select-none;
+}
+
+.placeholder-icon {
+  @apply text-5xl mb-4 opacity-60;
+}
+
+.placeholder-text {
+  @apply mb-2 font-medium;
+}
+
+.placeholder-hint {
+  @apply text-sm opacity-70;
+}
+
+.placeholder.hidden {
+  @apply hidden;
+}
