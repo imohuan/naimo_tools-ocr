@@ -1,0 +1,34 @@
+{
+  "name": "naimo-plugin-template",
+  "version": "1.0.0",
+  "description": "Naimo Tools 插件开发模板",
+  "type": "module",
+  "scripts": {
+    "init": "pnpm i && pnpm run add-electron-types && pnpm run dev",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "add-electron-types": "$env:ELECTRON_SKIP_DOWNLOAD=1; pnpm install electron --save-dev",
+    "deploy": "node scripts/deploy-to-build.js"
+  },
+  "keywords": [
+    "naimo",
+    "plugin",
+    "electron"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imohuan/naimo_tools-ocr.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/node": "^22.0.0",
+    "electron": "^38.2.2",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.5"
+  }
+}

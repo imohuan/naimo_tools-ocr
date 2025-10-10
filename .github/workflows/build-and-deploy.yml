@@ -1,0 +1,111 @@
+name: Build and Deploy
+
+on:
+  # 只在 main 分支的 push 触发
+  push:
+    branches:
+      - main
+    # 只监听 package.json 的变化
+    paths:
+      - "package.json"
+
+  # 允许手动触发
+  workflow_dispatch:
+
+# 设置权限
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整历史，用于后续操作
+
+      # 2. 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # 3. 检查 version 是否真的改变了
+      - name: Check Version Change
+        id: version_check
+        run: |
+          # 获取当前 version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          # 获取上一次提交的 version
+          git checkout HEAD~1 -- package.json 2>/dev/null || echo "No previous version"
+          PREVIOUS_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")
+          echo "Previous version: $PREVIOUS_VERSION"
+
+          # 恢复当前 package.json
+          git checkout HEAD -- package.json
+
+          # 比较版本
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            echo "version_changed=true" >> $GITHUB_OUTPUT
+            echo "new_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "Version not changed, skipping build"
+            echo "version_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      # 4. 安装依赖
+      - name: Install Dependencies
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: npm install
+
+      # 5. 类型检查
+      - name: Type Check
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: npm run type-check
+
+      # 6. 构建项目
+      - name: Build
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: npm run build
+
+      # 7. 部署到 build 分支
+      - name: Deploy to build branch
+        if: steps.version_check.outputs.version_changed == 'true'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: build
+          # 强制推送，删除之前的所有历史记录
+          force_orphan: true
+          # 提交信息
+          commit_message: |
+            🚀 Deploy v${{ steps.version_check.outputs.new_version }}
+
+            Auto-deployed from commit: ${{ github.event.head_commit.message }}
+          # 设置提交者信息
+          user_name: "github-actions[bot]"
+          user_email: "github-actions[bot]@users.noreply.github.com"
+
+      # 8. 输出构建结果
+      - name: Build Summary
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: |
+          echo "✅ Build completed successfully!"
+          echo "📦 Version ${{ steps.version_check.outputs.new_version }} deployed to 'build' branch"
+          echo "🔗 Commit: ${{ github.sha }}"
+          echo "📝 Message: ${{ github.event.head_commit.message }}"
+
+      # 9. 跳过构建的提示
+      - name: Skip Build Notice
+        if: steps.version_check.outputs.version_changed == 'false'
+        run: |
+          echo "⏭️ Build skipped - version not changed"
+          echo "💡 Update version in package.json to trigger a new build"

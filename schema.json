@@ -1,0 +1,479 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://naimo.tools/schemas/plugin-manifest.json",
+  "title": "Naimo Tools Plugin Manifest",
+  "description": "Naimo Tools 插件配置文件 (manifest.json) 的 JSON Schema",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "preload",
+    "feature",
+    "enabled"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema 引用路径"
+    },
+    "id": {
+      "type": "string",
+      "description": "插件唯一标识，建议使用英文小写字母、数字、短横线组合",
+      "pattern": "^[a-z0-9-]+$",
+      "minLength": 1,
+      "maxLength": 50,
+      "examples": [
+        "example-plugin",
+        "ocr-trans-plugin"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "插件名称，可以使用中文",
+      "minLength": 1,
+      "maxLength": 50,
+      "examples": [
+        "示例插件",
+        "OCR翻译插件"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "插件版本号，建议使用语义化版本",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-z0-9.-]+)?(\\+[a-z0-9.-]+)?$",
+      "examples": [
+        "1.0.0",
+        "1.2.3-beta.1"
+      ]
+    },
+    "author": {
+      "type": "string",
+      "description": "插件作者",
+      "maxLength": 100,
+      "examples": [
+        "Naimo Tools Team",
+        "张三"
+      ]
+    },
+    "icon": {
+      "type": "string",
+      "description": "插件图标，支持 emoji 或图片路径",
+      "examples": [
+        "🎯",
+        "./icon.png"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "插件描述",
+      "maxLength": 500,
+      "examples": [
+        "这是一个示例插件"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "description": "插件分类",
+      "enum": [
+        "efficient_office",
+        "ai_artificial_intelligence",
+        "developer_essentials",
+        "record_ideas",
+        "image_video",
+        "media_tools",
+        "system_tools",
+        "study_well",
+        "brainstorming",
+        "other"
+      ],
+      "examples": [
+        "developer_essentials"
+      ]
+    },
+    "downloadUrl": {
+      "type": "string",
+      "description": "插件下载地址",
+      "format": "uri",
+      "examples": [
+        "https://example.com/plugin.zip"
+      ]
+    },
+    "main": {
+      "type": "string",
+      "description": "UI 页面路径（可选，相对于插件根目录）",
+      "pattern": "^\\.\\/.*\\.(html|htm)$",
+      "examples": [
+        "./index.html",
+        "./ui/main.html"
+      ]
+    },
+    "preload": {
+      "type": "string",
+      "description": "Preload 脚本路径（必填，相对于插件根目录）",
+      "pattern": "^\\.\\/.*\\.js$",
+      "examples": [
+        "./preload.js",
+        "./scripts/preload.js"
+      ]
+    },
+    "feature": {
+      "type": "array",
+      "description": "功能列表，定义插件提供的所有功能",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/feature"
+      }
+    },
+    "options": {
+      "type": "object",
+      "description": "插件配置选项（自定义键值对）",
+      "additionalProperties": true
+    },
+    "settings": {
+      "type": "array",
+      "description": "插件设置配置",
+      "items": {
+        "$ref": "#/definitions/setting"
+      }
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "是否启用插件",
+      "default": true
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "feature": {
+      "type": "object",
+      "description": "插件功能项配置",
+      "required": [
+        "path",
+        "name",
+        "type"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "功能标识（英文，不带插件ID前缀）",
+          "pattern": "^[a-z0-9-]+$",
+          "examples": [
+            "hello-world",
+            "text-processor"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "功能名称",
+          "minLength": 1,
+          "maxLength": 50,
+          "examples": [
+            "Hello World",
+            "文本处理器"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "description": "功能类型，决定功能的搜索匹配行为",
+          "enum": [
+            "text",
+            "regex",
+            "img",
+            "files"
+          ],
+          "examples": [
+            "text"
+          ]
+        },
+        "icon": {
+          "type": "string",
+          "description": "功能图标",
+          "examples": [
+            "👋",
+            "./icons/hello.png"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "功能描述",
+          "maxLength": 200,
+          "examples": [
+            "最简单的示例功能"
+          ]
+        },
+        "weight": {
+          "type": "number",
+          "description": "排序权重，数值越大越靠前",
+          "minimum": 0,
+          "maximum": 1000,
+          "default": 0,
+          "examples": [
+            100
+          ]
+        },
+        "category": {
+          "type": "string",
+          "description": "功能分类",
+          "examples": [
+            "工具"
+          ]
+        },
+        "platform": {
+          "type": "array",
+          "description": "支持的平台",
+          "items": {
+            "type": "string",
+            "enum": [
+              "windows",
+              "macos",
+              "linux"
+            ]
+          },
+          "examples": [
+            [
+              "windows",
+              "macos"
+            ]
+          ]
+        },
+        "anonymousSearchFields": {
+          "type": "array",
+          "description": "匿名搜索字段列表（用于搜索匹配）",
+          "items": {
+            "type": "string"
+          },
+          "examples": [
+            [
+              "hello",
+              "world",
+              "示例"
+            ]
+          ]
+        },
+        "notVisibleSearch": {
+          "type": "boolean",
+          "description": "不在搜索框中主动显示",
+          "default": false
+        },
+        "showInModes": {
+          "type": "array",
+          "description": "显示模式（仅在指定模式下显示）",
+          "items": {
+            "type": "string",
+            "enum": [
+              "attachment",
+              "text",
+              "img"
+            ]
+          },
+          "examples": [
+            [
+              "attachment"
+            ]
+          ]
+        },
+        "lifecycleType": {
+          "type": "string",
+          "description": "生命周期类型",
+          "enum": [
+            "new",
+            "reuse",
+            "singleton"
+          ],
+          "default": "reuse",
+          "examples": [
+            "reuse"
+          ]
+        },
+        "singleton": {
+          "type": "boolean",
+          "description": "是否单例模式（同时只能打开一个窗口）",
+          "default": true
+        },
+        "autoStart": {
+          "type": "boolean",
+          "description": "是否开机启动",
+          "default": false
+        },
+        "recommend": {
+          "type": "boolean",
+          "description": "是否推荐",
+          "default": false
+        },
+        "match": {
+          "type": "string",
+          "description": "正则匹配表达式（仅当 type 为 regex 或 files 时有效）",
+          "examples": [
+            "^https?://"
+          ]
+        },
+        "exclude": {
+          "type": "string",
+          "description": "排除条件（仅当 type 为 regex 时有效）",
+          "examples": [
+            "^file://"
+          ]
+        },
+        "minLength": {
+          "type": "number",
+          "description": "最小长度限制",
+          "minimum": 0,
+          "examples": [
+            1
+          ]
+        },
+        "maxLength": {
+          "type": "number",
+          "description": "最大长度限制",
+          "minimum": 0,
+          "examples": [
+            100
+          ]
+        },
+        "fileType": {
+          "type": "string",
+          "description": "文件类型（仅当 type 为 files 时有效）",
+          "enum": [
+            "file",
+            "directory"
+          ],
+          "examples": [
+            "file"
+          ]
+        },
+        "extensions": {
+          "type": "array",
+          "description": "文件扩展名列表（仅当 type 为 files 时有效）",
+          "items": {
+            "type": "string",
+            "pattern": "^\\.[a-z0-9]+$"
+          },
+          "examples": [
+            [
+              ".jpg",
+              ".png",
+              ".gif"
+            ]
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "setting": {
+      "type": "object",
+      "description": "插件设置项配置",
+      "required": [
+        "name",
+        "title",
+        "type"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "设置项名称（英文，作为存储的键）",
+          "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$",
+          "examples": [
+            "apiKey",
+            "enableNotification"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "description": "设置项标题（显示给用户）",
+          "minLength": 1,
+          "maxLength": 50,
+          "examples": [
+            "API 密钥",
+            "启用通知"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "设置项描述",
+          "maxLength": 200,
+          "examples": [
+            "请输入你的 API 密钥"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "description": "设置项类型",
+          "enum": [
+            "input",
+            "switch",
+            "select",
+            "textarea",
+            "number"
+          ],
+          "examples": [
+            "input"
+          ]
+        },
+        "defaultValue": {
+          "description": "默认值（类型根据 type 字段决定）",
+          "examples": [
+            "",
+            true,
+            0
+          ]
+        },
+        "required": {
+          "type": "boolean",
+          "description": "是否必填",
+          "default": false
+        },
+        "option": {
+          "type": "object",
+          "description": "选项配置（仅当 type 为 select 时有效）",
+          "properties": {
+            "options": {
+              "type": "array",
+              "description": "选项列表",
+              "items": {
+                "type": "object",
+                "required": [
+                  "label",
+                  "value"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "description": "选项显示文本"
+                  },
+                  "value": {
+                    "description": "选项值"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "placeholder": {
+          "type": "string",
+          "description": "占位符文本",
+          "examples": [
+            "请输入..."
+          ]
+        },
+        "min": {
+          "type": "number",
+          "description": "最小值（仅当 type 为 number 时有效）"
+        },
+        "max": {
+          "type": "number",
+          "description": "最大值（仅当 type 为 number 时有效）"
+        },
+        "step": {
+          "type": "number",
+          "description": "步进值（仅当 type 为 number 时有效）",
+          "examples": [
+            1,
+            0.1
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
