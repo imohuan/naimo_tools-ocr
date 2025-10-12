@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCR翻译识别</title>
+  <script type="module" crossorigin src="./js/main.D7Mz6mv8.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/main.BhN6xtyc.css">
+</head>
+
+<body class="bg-gray-100">
+  <!-- 全屏Canvas背景 -->
+  <canvas id="canvas"></canvas>
+
+  <!-- 占位符 -->
+  <div class="placeholder" id="placeholder">
+    <div class="placeholder-icon">🖼️</div>
+    <div class="placeholder-text">没有加载图片</div>
+    <div class="placeholder-hint">点击 📷 截图 或 📁 打开图片开始使用</div>
+  </div>
+
+  <!-- 底部悬浮控制栏 -->
+  <div class="control-bar">
+    <button class="control-btn" id="screenshotBtn" title="截图">📷</button>
+    <button class="control-btn" id="openImageBtn" title="打开图片">📁</button>
+    <button class="control-btn" id="resetViewBtn" title="重置视图" disabled>🔄</button>
+    <button class="control-btn" id="saveImageBtn" title="保存图片" disabled>💾</button>
+    <button class="control-btn" id="copyTextBtn" title="复制文本" disabled>📋</button>
+    <button class="control-btn" id="settingsBtn" title="设置">⚙️</button>
+  </div>
+
+  <!-- 右侧抽屉设置面板 -->
+  <div class="settings-drawer" id="settingsDrawer">
+    <div class="settings-header">
+      <h2>设置</h2>
+      <button class="close-btn" id="closeSettingsBtn">×</button>
+    </div>
+
+    <div class="settings-content">
+      <!-- API配置 -->
+      <div class="setting-line">
+        <span class="setting-label">API配置</span>
+        <div class="api-status-inline">
+          <span class="status-indicator" id="statusIndicator">⚪</span>
+          <span id="statusText">未配置</span>
+        </div>
+      </div>
+
+      <!-- 语言设置 -->
+      <div class="setting-line">
+        <span class="setting-label">语言设置</span>
+        <select id="sourceLang" class="select-inline">
+          <option value="auto">自动检测</option>
+          <option value="zh">中文</option>
+          <option value="en">英文</option>
+          <option value="ja">日文</option>
+          <option value="ko">韩文</option>
+          <option value="fr">法文</option>
+          <option value="de">德文</option>
+          <option value="ru">俄文</option>
+        </select>
+        <span class="separator">→</span>
+        <select id="targetLang" class="select-inline">
+          <option value="zh">中文</option>
+          <option value="en">英文</option>
+          <option value="ja">日文</option>
+          <option value="ko">韩文</option>
+          <option value="fr">法文</option>
+          <option value="de">德文</option>
+          <option value="ru">俄文</option>
+          <option value="es">西班牙文</option>
+        </select>
+      </div>
+
+      <!-- 显示选项 -->
+      <div class="setting-line">
+        <span class="setting-label">显示选项</span>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="showOriginalImage" checked class="w-3 h-3">
+          <span class="text-[10px]">原图</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="showOriginalText" checked class="w-3 h-3">
+          <span class="text-[10px]">原文</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="showTranslatedText" checked class="w-3 h-3">
+          <span class="text-[10px]">译文</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="showBorder" checked class="w-3 h-3">
+          <span class="text-[10px]">边框</span>
+        </label>
+      </div>
+
+      <!-- 原始文本样式 -->
+      <div class="setting-line">
+        <span class="setting-label">原文样式</span>
+        <input type="color" id="originalTextColor" value="#FF0000" class="color-input">
+        <input type="number" id="originalTextSize" min="10" max="48" value="16" class="number-input">
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="originalTextBold" class="w-3 h-3">
+          <span class="text-[10px]">粗体</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="originalTextUnderline" class="w-3 h-3">
+          <span class="text-[10px]">下划线</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="originalTextWrap" checked class="w-3 h-3">
+          <span class="text-[10px]">换行</span>
+        </label>
+      </div>
+
+      <!-- 原始文本偏移 -->
+      <div class="setting-line">
+        <span class="setting-label">原文偏移</span>
+        <input type="number" id="originalTextOffsetX" min="-200" max="200" value="0" class="number-input"
+          placeholder="X">
+        <input type="number" id="originalTextOffsetY" min="-200" max="200" value="0" class="number-input"
+          placeholder="Y">
+      </div>
+
+      <!-- 目标文本样式 -->
+      <div class="setting-line">
+        <span class="setting-label">译文样式</span>
+        <input type="color" id="translatedTextColor" value="#0000FF" class="color-input">
+        <input type="number" id="translatedTextSize" min="10" max="48" value="16" class="number-input">
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="translatedTextBold" class="w-3 h-3">
+          <span class="text-[10px]">粗体</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="translatedTextUnderline" class="w-3 h-3">
+          <span class="text-[10px]">下划线</span>
+        </label>
+        <label class="flex items-center gap-1 cursor-pointer">
+          <input type="checkbox" id="translatedTextWrap" checked class="w-3 h-3">
+          <span class="text-[10px]">换行</span>
+        </label>
+      </div>
+
+      <!-- 目标文本偏移 -->
+      <div class="setting-line">
+        <span class="setting-label">译文偏移</span>
+        <input type="number" id="translatedTextOffsetX" min="-200" max="200" value="0" class="number-input"
+          placeholder="X">
+        <input type="number" id="translatedTextOffsetY" min="-200" max="200" value="20" class="number-input"
+          placeholder="Y">
+      </div>
+
+      <!-- 背景样式 -->
+      <div class="setting-line">
+        <span class="setting-label">背景样式</span>
+        <input type="color" id="textBackgroundColor" value="#000000" class="color-input">
+        <input type="range" id="textBackgroundOpacity" min="0" max="100" value="70" class="range-input">
+        <span class="range-value" id="textBackgroundOpacityValue">70%</span>
+      </div>
+
+      <!-- 背景边框 -->
+      <div class="setting-line">
+        <span class="setting-label">边框样式</span>
+        <input type="range" id="boxBorderWidth" min="0" max="10" value="2" class="range-input">
+        <span class="range-value" id="boxBorderWidthValue">2px</span>
+        <input type="color" id="boxBorderColor" value="#007AFF" class="color-input">
+      </div>
+    </div>
+  </div>
+
+  <!-- 加载动画 -->
+  <div class="loading hidden" id="loading">
+    <div class="spinner"></div>
+    <div>正在处理图片...</div>
+  </div>
+
+  <!-- 状态提示 -->
+  <div id="statusToast"></div>
+
+  <!-- TypeScript 入口文件 -->
+</body>
+
+</html>

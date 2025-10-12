@@ -1,0 +1,69 @@
+{
+  "$schema": "./schema.json",
+  "id": "ocr-plugin",
+  "name": "OCR翻译识别",
+  "version": "1.0.5",
+  "author": "Naimo Tools",
+  "icon": "./ico.png",
+  "description": "智能截图识别文字并翻译，支持多种语言互译",
+  "category": "ai_artificial_intelligence",
+  "enabled": true,
+  "main": "./index.html",
+  "preload": "./preload.js",
+  "feature": [
+    {
+      "path": "ocr-translate",
+      "name": "OCR翻译",
+      "icon": "./ico.png",
+      "description": "截图识别文字并翻译",
+      "type": "text",
+      "weight": 100,
+      "lifecycleType": "reuse",
+      "singleton": true,
+      "anonymousSearchFields": [
+        "ocr",
+        "翻译",
+        "识别",
+        "截图"
+      ]
+    },
+    {
+      "path": "screenshot-ocr-translate",
+      "name": "截图识别",
+      "icon": "./ico.png",
+      "description": "快速截图并识别文字",
+      "type": "text",
+      "weight": 90,
+      "lifecycleType": "reuse",
+      "singleton": true
+    },
+    {
+      "path": "quick-ocr-translate",
+      "name": "当前图片识别",
+      "icon": "./ico.png",
+      "description": "快速截图并识别文字",
+      "type": "img",
+      "weight": 90,
+      "lifecycleType": "reuse",
+      "singleton": true
+    }
+  ],
+  "settings": [
+    {
+      "name": "tencentSecretId",
+      "title": "腾讯云Secret ID",
+      "description": "腾讯云API密钥ID（用于OCR和翻译服务）",
+      "type": "input",
+      "defaultValue": "",
+      "required": true
+    },
+    {
+      "name": "tencentSecretKey",
+      "title": "腾讯云Secret Key",
+      "description": "腾讯云API密钥Key",
+      "type": "input",
+      "defaultValue": "",
+      "required": true
+    }
+  ]
+}
