@@ -86,6 +86,7 @@ class OCRTranslator {
   private lastMouseY: number;
   private naimo: NaimoAPI;
   private ocrAPI: OCRPluginAPI;
+  initDone: boolean;
 
   constructor() {
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -101,7 +102,7 @@ class OCRTranslator {
     this.lastMouseY = 0;
     this.naimo = window.naimo;
     this.ocrAPI = window.ocrPluginAPI;
-
+    this.initDone = false;
     this.init();
   }
 
@@ -111,22 +112,18 @@ class OCRTranslator {
     this.setupCanvas();
     this.updateSettingsUI();
     this.showPlaceholder();
-
-    // 检查是否需要自动启动截图
-    setTimeout(() => {
-      this.checkAutoStartScreenshot();
-    }, 500);
+    this.initDone = true;
   }
 
-  checkAutoStartScreenshot() {
-    try {
-      if (window.__metadata && window.__metadata.autoStartScreenshot) {
-        console.log('检测到自动启动截图标志，将在500ms后开始截图');
-        this.takeScreenshot();
-      }
-    } catch (error) {
-      console.error('检查自动启动截图失败:', error);
-    }
+  async waitInitDone() {
+    return new Promise(resolve => {
+      const interval = setInterval(() => {
+        if (this.initDone) {
+          clearInterval(interval);
+          resolve(true);
+        }
+      }, 100);
+    });
   }
 
   async loadSettings() {
@@ -529,7 +526,7 @@ class OCRTranslator {
         this.showError('截图功能不可用，请检查插件配置');
       }
     } catch (error: any) {
-      naimo.log.throw_error('截图失败:', error.message);
+      // naimo.log.throw_error('截图失败:', error.message);
       this.showError('截图失败: ' + (error as Error).message);
     } finally {
       this.hideStatus();
@@ -669,7 +666,11 @@ class OCRTranslator {
 
       const showBorder = this.settings.showBorder === true;
 
-      // 绘制文本背景
+      // 获取译文偏移量用于边框位置
+      const translatedOffsetX = parseInt(String(this.settings.translatedTextOffsetX)) || 0;
+      const translatedOffsetY = parseInt(String(this.settings.translatedTextOffsetY)) || 0;
+
+      // 绘制文本背景（跟随译文偏移）
       const bgOpacity = (this.settings.textBackgroundOpacity || 0) / 100;
       if (showBorder && bgOpacity > 0) {
         const bgColor = this.settings.textBackgroundColor || '#000000';
@@ -677,15 +678,15 @@ class OCRTranslator {
         const g = parseInt(bgColor.slice(3, 5), 16);
         const b = parseInt(bgColor.slice(5, 7), 16);
         this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${bgOpacity})`;
-        this.ctx.fillRect(minX, minY, width, height);
+        this.ctx.fillRect(minX + translatedOffsetX, minY + translatedOffsetY, width, height);
       }
 
-      // 绘制边框
+      // 绘制边框（跟随译文偏移）
       const borderWidth = this.settings.boxBorderWidth || 2;
       if (showBorder && borderWidth > 0) {
         this.ctx.strokeStyle = this.settings.boxBorderColor || '#007AFF';
         this.ctx.lineWidth = borderWidth;
-        this.ctx.strokeRect(minX, minY, width, height);
+        this.ctx.strokeRect(minX + translatedOffsetX, minY + translatedOffsetY, width, height);
       }
 
       const baseX = minX + 5;
@@ -934,11 +935,14 @@ class OCRTranslator {
 
 // ==================== 入口 ====================
 
+// 全局 OCR 翻译器实例
+let ocrTranslator: OCRTranslator | null = null;
+
 async function initApp(): Promise<void> {
   console.log('应用初始化...');
 
   try {
-    new OCRTranslator();
+    ocrTranslator = new OCRTranslator();
     window.naimo.log.info('OCR翻译插件初始化完成');
   } catch (error) {
     console.error('初始化失败:', error);
@@ -951,3 +955,59 @@ if (document.readyState === 'loading') {
 } else {
   initApp();
 }
+
+const waitOCRTranslatorInitDone = async () => {
+  // 等待 ocrTranslator 初始化，循环
+  await new Promise<void>(resolve => {
+    const interval = setInterval(() => {
+      if (ocrTranslator) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 100);
+  });
+  await ocrTranslator!.waitInitDone();
+}
+
+// 监听从外部拖入图片或通过右键菜单打开图片
+naimo.onEnter(async (params: any) => {
+  const path = params.fullPath.split(":").slice(1).join(":")
+  if (path === "screenshot-ocr-translate") {
+    await waitOCRTranslatorInitDone();
+    await ocrTranslator!.takeScreenshot();
+    // // 读取剪切板 
+    // const imageData = await window.naimo.clipboard.readImage();
+    // if (imageData) {
+    //   await ocrTranslator!.processImage(imageData);
+    // } else {
+    //   console.error('无法获取剪切板图片数据');
+    //   naimo.log.error('无法获取剪切板图片数据');
+    // }
+    return
+  };
+
+  try {
+    const imagePath = params?.files?.[0]?.path;
+    if (!imagePath) {
+      console.log('未接收到图片路径');
+      return;
+    }
+
+    console.log('接收到图片路径:', imagePath);
+    await waitOCRTranslatorInitDone();
+    // 获取图片的 base64 数据
+    const imageData = await window.ocrPluginAPI.loadLocalImage(imagePath);
+    if (imageData && ocrTranslator) {
+      // 将图片处理并显示在窗口中
+      await ocrTranslator.processImage(imageData);
+      console.log('图片已成功加载并显示在窗口中');
+      naimo.log.info('图片已加载到窗口');
+    } else {
+      console.error('无法获取图片数据');
+      naimo.log.error('无法获取图片数据');
+    }
+  } catch (error) {
+    console.error('处理外部图片失败:', error);
+    naimo.log.error('处理外部图片失败', error);
+  }
+});

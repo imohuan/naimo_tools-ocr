@@ -2,9 +2,9 @@
   "$schema": "./schema.json",
   "id": "ocr-plugin",
   "name": "OCR翻译识别",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "author": "Naimo Tools",
-  "icon": "📷",
+  "icon": "./ico.png",
   "description": "智能截图识别文字并翻译，支持多种语言互译",
   "category": "ai_artificial_intelligence",
   "enabled": true,
@@ -14,7 +14,7 @@
     {
       "path": "ocr-translate",
       "name": "OCR翻译",
-      "icon": "🔍",
+      "icon": "./ico.png",
       "description": "截图识别文字并翻译",
       "type": "text",
       "weight": 100,
@@ -28,19 +28,24 @@
       ]
     },
     {
-      "path": "quick-ocr",
-      "name": "快速截图识别",
-      "icon": "⚡",
+      "path": "screenshot-ocr-translate",
+      "name": "截图识别",
+      "icon": "./ico.png",
       "description": "快速截图并识别文字",
       "type": "text",
       "weight": 90,
       "lifecycleType": "reuse",
-      "singleton": true,
-      "anonymousSearchFields": [
-        "快速ocr",
-        "快速识别",
-        "截图识别"
-      ]
+      "singleton": true
+    },
+    {
+      "path": "quick-ocr-translate",
+      "name": "当前图片识别",
+      "icon": "./ico.png",
+      "description": "快速截图并识别文字",
+      "type": "img",
+      "weight": 90,
+      "lifecycleType": "reuse",
+      "singleton": true
     }
   ],
   "settings": [

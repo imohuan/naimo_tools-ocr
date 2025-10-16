@@ -33,6 +33,7 @@ interface OCROptions {
 interface OCRPluginAPI {
   takeScreenshot: () => Promise<string>;
   selectImage: () => Promise<string | null>;
+  loadLocalImage: (filePath: string) => Promise<string>;
   performOCR: (options: OCROptions) => Promise<OCRResult[]>;
 }
 
@@ -332,7 +333,8 @@ const ocrPluginAPI: OCRPluginAPI = {
         throw new Error(result.error || '截图失败');
       }
     } catch (error: any) {
-      naimo.log.throw_error('截图失败:', error);
+      // naimo.log.throw_error('截图失败:', error);
+      console.error('截图失败:', error.message);
       throw error;
     }
   },
@@ -365,6 +367,24 @@ const ocrPluginAPI: OCRPluginAPI = {
       return `data:${mimeType};base64,${base64Data}`;
     } catch (error) {
       console.error('选择图片失败:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * 加载本地图片文件
+   */
+  async loadLocalImage(filePath: string) {
+    try {
+      // 读取文件并转换为base64
+      const fs = require('fs');
+      const fileBuffer = fs.readFileSync(filePath);
+      const base64Data = fileBuffer.toString('base64');
+      const mimeType = getMimeType(filePath);
+
+      return `data:${mimeType};base64,${base64Data}`;
+    } catch (error) {
+      console.error('加载本地图片失败:', error);
       throw error;
     }
   },
